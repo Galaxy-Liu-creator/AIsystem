@@ -1,0 +1,48 @@
+.superpowers/
+_tmp_docmee_aippt_vue/
+/backend/media/
+/.planning
+/docs/详细设计文档
+RAG-plus.md
+/ppt
+
+# Local configuration and credentials
+**/.env
+**/.env.*
+!**/.env.example
+!/teacher-platform/.env.development
+/.claude/settings.local.json
+/.idea/
+/.vscode/
+
+# Generated application data
+/backend/chroma_data/
+/backend/lightrag_data/
+**/uploads/
+**/exports/
+**/temp/
+**/extracted/
+**/parse_results/
+
+# Dependencies, build output, caches and logs
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.venv/
+**/venv/
+*.py[cod]
+*.log
+.coverage
+htmlcov/
+/backend/0.27.0
+/backend/1.23.0
+
+# Downloaded reference package and OS metadata
+/teacher-platform/public/libs/avatar-sdk-web_demo/
+__MACOSX/
+._*
+.DS_Store
+Thumbs.db
