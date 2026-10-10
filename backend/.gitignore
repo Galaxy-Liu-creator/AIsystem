@@ -39,6 +39,7 @@ env/
 # 数据库
 *.db
 *.sqlite
+.postgres-data/
 
 # 日志
 *.log

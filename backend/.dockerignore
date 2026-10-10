@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.postgres-data
+.venv
+venv
+__pycache__
+**/__pycache__
+.pytest_cache
+.git
+media
+uploads
+chroma_data
+lightrag_data
+tests
+*.log

@@ -15,7 +15,40 @@
 
 ## 🚀 快速开始
 
-本项目包含前端和后端两部分。请按照以下步骤启动项目：
+### Docker 一键启动（本机比赛演示）
+
+安装并启动 Docker Desktop，使用 Linux 容器。在项目根目录运行：
+
+```bash
+docker compose up -d --build --wait --wait-timeout 600
+```
+
+也可在 Git Bash 中执行 `bash docker-up.sh`，脚本会检查并尝试启动 Docker Desktop。
+首次构建需要下载 Python、Node、Chromium 和项目依赖；后续启动使用缓存。
+五个服务统一启动：前端 Nginx、FastAPI、Celery、PostgreSQL、Redis。
+
+- 前端：http://127.0.0.1:5174/
+- 后端文档：http://127.0.0.1:8000/doc.html
+- 状态：`docker compose ps`
+- 日志：`docker compose logs -f app worker`
+- 停止：`docker compose down`
+- 下次启动：`docker compose up -d --wait --wait-timeout 600`
+
+配置从 `backend/.env` 读取；本机已创建该文件。自己的 AI 服务密钥需要填写到该文件，
+修改后运行 `docker compose up -d --force-recreate app worker` 使配置生效。
+密钥文件不会打包进镜像。数据库和 Redis 只在 Docker 内网开放，避免占用本机 5432/6379。
+5174 和 8000 需要空闲；如果旧的手动服务仍在运行，应先停止它们。
+
+数据库、Redis 和模型缓存使用 Docker 数据卷；上传和生成文件保留在
+`backend/media`、`backend/uploads`，知识库保留在 `backend/chroma_data` 和
+`backend/lightrag_data`。普通 `docker compose down` 保留数据，
+不要使用 `docker compose down -v`，该选项会删除数据库等数据卷。
+首次部署到其他电脑会创建独立的空数据库，需要另行迁移原有数据库和知识库。
+原来的 `backend/docker-compose.yml` 已统一引用根目录配置。
+
+### 手动开发启动
+
+本项目包含前端和后端两部分，也可以按照以下步骤分别启动：
 
 ### 前端 (teacher-platform)
 

@@ -68,9 +68,9 @@ class Settings(BaseSettings):
     GENAI_TIMEOUT: float = 300.0
     GENAI_MAX_RETRIES: int = 2
     # 各模型选择（可选，默认用 AI_PROVIDER_FORMAT 对应的模型）
-    TEXT_MODEL: str = ""
-    IMAGE_MODEL: str = ""
-    IMAGE_CAPTION_MODEL: str = ""
+    TEXT_MODEL: str = "gemini-3.1-flash-lite"
+    IMAGE_MODEL: str = "gemini-3.1-flash-lite-image"
+    IMAGE_CAPTION_MODEL: str = "gemini-3.1-flash-lite"
     # 国内厂商 API Key（按需填）
     DOUBAO_API_KEY: str = ""
     QWEN_API_KEY: str = ""

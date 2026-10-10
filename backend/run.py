@@ -20,7 +20,7 @@ def main():
     print("多模态 AI 互动式教学智能体")
     print("=" * 50)
     print(f"启动地址: http://{settings.APP_HOST}:{settings.APP_PORT}")
-    print(f"API 文档: http://{settings.APP_HOST}:{settings.APP_PORT}/docs")
+    print(f"API 文档: http://{settings.APP_HOST}:{settings.APP_PORT}/doc.html")
     print("=" * 50)
 
     uvicorn.run(
