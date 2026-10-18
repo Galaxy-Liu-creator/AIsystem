@@ -1,0 +1,103 @@
+name: math-media
+
+x-backend: &backend
+  image: math-media-backend:local
+  build:
+    context: ./backend
+    args:
+      INSTALL_PLAYWRIGHT: "true"
+  env_file:
+    - ./backend/.env
+  environment:
+    APP_HOST: 0.0.0.0
+    APP_PORT: "8000"
+    DEBUG: "false"
+    DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/ai_teaching
+    DATABASE_URL_SYNC: postgresql://postgres:postgres@db:5432/ai_teaching
+    REDIS_URL: redis://cache:6379/0
+    CHROMA_PERSIST_DIR: /app/chroma_data
+    LIGHTRAG_WORKING_DIR: /app/lightrag_data
+  volumes:
+    - ./backend/media:/app/media
+    - ./backend/uploads:/app/uploads
+    - ./backend/chroma_data:/app/chroma_data
+    - ./backend/lightrag_data:/app/lightrag_data
+    - model_cache:/home/appuser/.cache
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ai_teaching
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d ai_teaching"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  cache:
+    image: redis:7
+    command: [redis-server, --appendonly, "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  app:
+    <<: *backend
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"]
+      interval: 10s
+      timeout: 10s
+      start_period: 60s
+      retries: 12
+
+  worker:
+    <<: *backend
+    command: [celery, -A, "app.celery:celery_app", worker, --loglevel=info, --concurrency=2, -Q, default]
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'celery -A app.celery:celery_app inspect ping -d "celery@$$HOSTNAME" --timeout=10 | grep -q pong']
+      interval: 30s
+      timeout: 20s
+      start_period: 90s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./teacher-platform
+    ports:
+      - "127.0.0.1:5174:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, wget, -q, --spider, "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  model_cache:

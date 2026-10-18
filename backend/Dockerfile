@@ -33,19 +33,16 @@ ARG PIP_TIMEOUT=120
 
 # 复制依赖文件并安装（先 requirements，后本项目）
 COPY requirements.txt ./
-COPY pyproject.toml ./
-RUN pip install --no-cache-dir \
+# 本地演示使用 CPU 嵌入模型，避免安装数 GB 的 CUDA 运行库。
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --index-url https://download.pytorch.org/whl/cpu \
+        --retries ${PIP_RETRIES} --timeout ${PIP_TIMEOUT} "torch>=2.6" && \
+    pip install \
         -i ${PIP_INDEX_URL} \
         --trusted-host ${PIP_TRUSTED_HOST} \
         --retries ${PIP_RETRIES} \
         --timeout ${PIP_TIMEOUT} \
-        -r requirements.txt && \
-    pip install --no-cache-dir \
-        -i ${PIP_INDEX_URL} \
-        --trusted-host ${PIP_TRUSTED_HOST} \
-        --retries ${PIP_RETRIES} \
-        --timeout ${PIP_TIMEOUT} \
-        .
+        -r requirements.txt
 
 # ============================================
 # 阶段2: 运行阶段
@@ -66,6 +63,8 @@ RUN set -eux; \
             apt-get install -y --no-install-recommends \
                 libpq5 \
                 ffmpeg \
+                pandoc \
+                fonts-wqy-zenhei \
                 # Playwright/Chromium runtime deps
                 libnss3 \
                 libnspr4 \
@@ -102,8 +101,9 @@ RUN set -eux; \
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# 可选安装 Chromium（用于导出 GIF 渲染），默认跳过以提升构建稳定性
-ARG INSTALL_PLAYWRIGHT=false
+# 在共享路径安装 Chromium，确保非 root 用户也可访问。
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright
+ARG INSTALL_PLAYWRIGHT=true
 RUN if [ "$INSTALL_PLAYWRIGHT" = "true" ]; then \
             python -m playwright install chromium; \
         else \
@@ -117,7 +117,9 @@ COPY alembic.ini ./
 COPY .env.example ./
 
 # 创建非 root 用户
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+RUN useradd -m -u 1000 appuser && \
+    mkdir -p /app/media /app/uploads /app/chroma_data /app/lightrag_data /home/appuser/.cache && \
+    chown -R appuser:appuser /app /home/appuser
 USER appuser
 
 # 暴露端口

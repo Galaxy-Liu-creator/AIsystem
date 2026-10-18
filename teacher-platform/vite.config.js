@@ -15,6 +15,8 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.js'],
   },
   server: {
+    port: 5174,
+    strictPort: true,
     proxy: {
       // 将前端开发环境的 /api 请求转发到后端 FastAPI
       '/api': {

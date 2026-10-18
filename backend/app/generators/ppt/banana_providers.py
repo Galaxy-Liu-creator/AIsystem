@@ -176,7 +176,7 @@ class ImageProvider(ABC):
 class GenAITextProvider(TextProvider):
     """Google GenAI SDK 文本生成"""
 
-    def __init__(self, api_key: str, api_base: str = None, model: str = "gemini-2.0-flash-preview-image-generation"):
+    def __init__(self, api_key: str, api_base: str = None, model: str = "gemini-3.1-flash-lite"):
         from google import genai
         self.model = model
         client_kwargs = {"api_key": api_key}
@@ -237,7 +237,7 @@ _RESOLUTION_MAP = {
 class GenAIImageProvider(ImageProvider):
     """Google GenAI SDK 图片生成"""
 
-    def __init__(self, api_key: str, api_base: str = None, model: str = "gemini-2.0-flash-preview-image-generation"):
+    def __init__(self, api_key: str, api_base: str = None, model: str = "gemini-3.1-flash-image"):
         from google import genai
         self.model = model
         client_kwargs = {"api_key": api_key}
@@ -442,7 +442,7 @@ class OpenAIImageProvider(ImageProvider):
     通过 chat.completions 发送图文请求，从响应中提取内嵌图片。
     """
 
-    def __init__(self, api_key: str, api_base: str = None, model: str = "gemini-2.0-flash-preview-image-generation"):
+    def __init__(self, api_key: str, api_base: str = None, model: str = "gemini-3.1-flash-image"):
         from openai import OpenAI
         settings = get_settings()
         self.client = OpenAI(
@@ -572,7 +572,7 @@ def get_text_provider() -> TextProvider:
     # 默认 gemini
     api_key = settings.GOOGLE_API_KEY
     api_base = settings.GOOGLE_API_BASE or None
-    model = model or "gemini-2.0-flash"
+    model = model or "gemini-3.1-flash-lite"
     logger.info("TextProvider: GenAI (Gemini), model=%s", model)
     return GenAITextProvider(api_key=api_key, api_base=api_base, model=model)
 
@@ -590,14 +590,15 @@ def get_image_provider() -> ImageProvider:
 
     if fmt == "openai":
         api_key = settings.OPENAI_API_KEY
-        model = model or "gemini-2.0-flash-preview-image-generation"
+        model = model or "gemini-3.1-flash-image"
         logger.info("ImageProvider: OpenAI-compat, model=%s", model)
         return OpenAIImageProvider(api_key=api_key, model=model)
 
     # 默认 gemini（anthropic 也回退到 gemini）
-    api_key = settings.GOOGLE_API_KEY
-    api_base = settings.GOOGLE_API_BASE or None
-    model = model or "gemini-2.0-flash-preview-image-generation"
+    # 生图走独立地址；未单独填写生图密钥时，复用文本密钥。
+    api_key = (settings.GOOGLE_IMAGE_API_KEY or settings.GOOGLE_API_KEY or "").strip()
+    api_base = (settings.GOOGLE_IMAGE_API_BASE or settings.GOOGLE_API_BASE or "").strip() or None
+    model = model or "gemini-3.1-flash-image"
     logger.info("ImageProvider: GenAI (Gemini), model=%s", model)
     return GenAIImageProvider(api_key=api_key, api_base=api_base, model=model)
 

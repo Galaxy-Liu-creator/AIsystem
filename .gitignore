@@ -40,6 +40,9 @@ htmlcov/
 /backend/0.27.0
 /backend/1.23.0
 
+# Local database dumps contain account data and must stay untracked
+/resources/*.sql
+
 # Downloaded reference package and OS metadata
 /teacher-platform/public/libs/avatar-sdk-web_demo/
 __MACOSX/

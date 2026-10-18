@@ -18,9 +18,9 @@ class GeminiMultimodalService:
     def __init__(self):
         settings = get_settings()
         self.api_key = settings.GOOGLE_API_KEY
-        self.api_base = (settings.GOOGLE_API_BASE or "https://generativelanguage.googleapis.com").rstrip("/")
-        self.image_model = settings.IMAGE_CAPTION_MODEL or settings.TEXT_MODEL or "gemini-2.0-flash"
-        self.text_model = settings.TEXT_MODEL or "gemini-2.0-flash"
+        self.api_base = (settings.GOOGLE_API_BASE or "https://apinebula.ai").rstrip("/")
+        self.image_model = settings.IMAGE_CAPTION_MODEL or settings.TEXT_MODEL or "gemini-3.1-flash-lite-preview"
+        self.text_model = settings.TEXT_MODEL or "gemini-3.1-flash-lite"
         self.timeout = settings.GENAI_TIMEOUT
 
     def is_enabled(self) -> bool:

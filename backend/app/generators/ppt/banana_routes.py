@@ -3399,11 +3399,12 @@ Only output the style description text, no other content.
 
     # 调用 Gemini API (使用 HTTP 请求)
     try:
-        api_base = settings.GOOGLE_API_BASE or "https://generativelanguage.googleapis.com"
+        api_base = settings.GOOGLE_API_BASE or "https://apinebula.ai"
         api_key = settings.GOOGLE_API_KEY
 
         # 构建请求 URL
-        url = f"{api_base}/v1beta/models/gemini-2.0-flash:generateContent"
+        caption_model = settings.IMAGE_CAPTION_MODEL or settings.TEXT_MODEL or "gemini-3.1-flash-lite-preview"
+        url = f"{api_base}/v1beta/models/{caption_model}:generateContent"
 
         # 将图片转为 base64
         b64_image = base64.b64encode(image_bytes).decode('utf-8')
