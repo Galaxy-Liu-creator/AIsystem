@@ -149,7 +149,7 @@ function toggleAdminDigitalHumanVoice() {
           <img data-test="sidebar-brand-logo" class="brand-logo" src="/logo.svg" alt="" />
         </div>
         <div v-if="!sidebarCollapsed" class="brand-text">
-          <img data-test="sidebar-brand-name" class="brand-character" src="/character.svg" alt="智课坊" />
+          <img data-test="sidebar-brand-name" class="brand-character" src="/character.svg" alt="智课引擎" />
         </div>
       </div>
 
@@ -613,16 +613,13 @@ function toggleAdminDigitalHumanVoice() {
   object-fit: contain;
 }
 
-.brand-character {
-  width: 96px;
-  height: 32px;
-  display: block;
-  object-fit: contain;
-  object-position: left center;
+.brand-text {
+  flex: 1;
+  min-width: 0;
 }
 
 .brand-character {
-  width: 96px;
+  width: 100%;
   height: 32px;
   display: block;
   object-fit: contain;

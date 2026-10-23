@@ -1,0 +1,6 @@
+services:
+  frontend:
+    ports:
+      - "80:80"
+  worker:
+    command: [celery, -A, "app.celery:celery_app", worker, --loglevel=info, "--concurrency=1", -Q, default]

@@ -6,7 +6,7 @@
       <template v-for="el in elements" :key="el.id">
         <!-- Text element -->
         <div v-if="el.type === 'text'" :data-element-id="el.id"
-             :style="{ position: 'absolute', left: el.left + 'px', top: el.top + 'px', width: el.width + 'px', height: el.height + 'px', fontSize: (el.fontSize || 18) + 'px', color: el.color || '#333' }"
+             :style="{ position: 'absolute', left: (el.left ?? 0) + 'px', top: (el.top ?? 0) + 'px', width: (el.width || 840) + 'px', height: (el.height || 48) + 'px', fontSize: (el.fontSize || 18) + 'px', color: el.color || '#333' }"
              v-html="el.content" />
         <!-- Image element -->
         <img v-else-if="el.type === 'image'" :data-element-id="el.id"
@@ -33,7 +33,28 @@ const scale = ref(1)
 
 const viewportSize = computed(() => props.slide?.viewportSize || 1000)
 const viewportHeight = computed(() => viewportSize.value * (props.slide?.viewportRatio || 0.5625))
-const elements = computed(() => props.slide?.elements || [])
+const elements = computed(() => layoutElements(props.slide?.elements || []))
+
+function layoutElements(raw) {
+  const missing = raw.some((el) => el.left == null || el.top == null)
+  if (!missing) return raw
+  const textCount = raw.filter((el) => el.type === 'text' && (el.left == null || el.top == null)).length
+  const gap = textCount > 1 ? Math.min(72, Math.max(40, Math.floor(400 / (textCount - 1)))) : 72
+  let textIndex = 0
+  return raw.map((el) => {
+    if (el.left != null && el.top != null) return el
+    if (el.type === 'text' && textIndex === 0) {
+      textIndex += 1
+      return { ...el, left: 60, top: 36, width: el.width || 880, height: el.height || 64, fontSize: el.fontSize || 32 }
+    }
+    if (el.type === 'text') {
+      const index = textIndex
+      textIndex += 1
+      return { ...el, left: 80, top: 120 + (index - 1) * gap, width: el.width || 840, height: el.height || 48, fontSize: el.fontSize || 22 }
+    }
+    return { ...el, left: el.left || 640, top: el.top || 140, width: el.width || 280, height: el.height || 220 }
+  })
+}
 const bgColor = computed(() => {
   const bg = props.slide?.background
   if (!bg) return '#ffffff'

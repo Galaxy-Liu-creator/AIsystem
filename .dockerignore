@@ -1,0 +1,17 @@
+.git
+**/.venv
+**/venv
+**/__pycache__
+**/.pytest_cache
+**/*.pyc
+**/node_modules
+backend/chroma_data
+backend/lightrag_data
+backend/media
+backend/uploads
+backend/tests
+backend/.env
+backend/.env.*
+!backend/.env.example
+**/*.log
+docs

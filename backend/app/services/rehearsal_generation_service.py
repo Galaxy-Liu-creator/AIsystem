@@ -374,6 +374,7 @@ async def _generate_scene(
             slide_content = await _call_llm_json(SLIDE_CONTENT_SYSTEM_PROMPT, slide_prompt)
             if not slide_content or not isinstance(slide_content, dict):
                 slide_content = _fallback_slide(outline, scene_order)
+            slide_content = _ensure_slide_layout(slide_content)
 
             slide_content = await populate_slide_media(
                 slide_content,
@@ -697,6 +698,39 @@ async def retry_scene(session_id: int, scene_order: int, user_id: int) -> str:
         await db.commit()
 
     return scene_status
+
+
+def _ensure_slide_layout(slide: dict) -> dict:
+    """Give text elements a readable position when the model omits coordinates."""
+    elements = slide.get("elements") or []
+    if not any(isinstance(el, dict) and (el.get("left") is None or el.get("top") is None) for el in elements):
+        slide.setdefault("viewportSize", 1000)
+        slide.setdefault("viewportRatio", 0.5625)
+        return slide
+
+    texts = [el for el in elements if isinstance(el, dict) and el.get("type") == "text" and (el.get("left") is None or el.get("top") is None)]
+    gap = min(72, max(40, int(400 / max(len(texts) - 1, 1))))
+    text_index = 0
+    laid_out = []
+    for el in elements:
+        if not isinstance(el, dict) or (el.get("left") is not None and el.get("top") is not None):
+            laid_out.append(el)
+            continue
+        item = dict(el)
+        if item.get("type") == "text" and text_index == 0:
+            item.update(left=60, top=36, width=item.get("width") or 880, height=item.get("height") or 64, fontSize=item.get("fontSize") or 32)
+            text_index += 1
+        elif item.get("type") == "text":
+            item.update(left=80, top=120 + (text_index - 1) * gap, width=item.get("width") or 840, height=item.get("height") or 48, fontSize=item.get("fontSize") or 22)
+            text_index += 1
+        else:
+            item.update(left=item.get("left") if item.get("left") is not None else 640, top=item.get("top") if item.get("top") is not None else 140, width=item.get("width") or 280, height=item.get("height") or 220)
+        laid_out.append(item)
+    slide = dict(slide)
+    slide["elements"] = laid_out
+    slide.setdefault("viewportSize", 1000)
+    slide.setdefault("viewportRatio", 0.5625)
+    return slide
 
 
 def _fallback_slide(outline: dict, idx: int) -> dict:

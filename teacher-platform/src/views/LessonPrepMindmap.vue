@@ -10,6 +10,7 @@ import { toPng } from 'html-to-image'
 import MarkmapRenderer from '../components/MarkmapRenderer.vue'
 import { initWasm, Resvg } from '@resvg/resvg-wasm'
 import resvgWasmUrl from '@resvg/resvg-wasm/index_bg.wasm?url'
+import { loadDemoSnapshot } from '../utils/demoSnapshot.js'
 
 const promptText = ref('')
 const { isRecording, isSupported, toggleRecording } = useVoiceInput(promptText)
@@ -579,8 +580,28 @@ function onFullscreenChange() {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('fullscreenchange', onFullscreenChange)
+  if (chatMessages.value.length) return
+  const snap = await loadDemoSnapshot('mindmap')
+  if (!snap?.markdown) return
+  chatMessages.value = [
+    {
+      id: 'demo_user_mindmap',
+      role: 'user',
+      type: 'text',
+      content: snap.prompt || '钱的演变：从贝壳到纸币的旅程'
+    },
+    {
+      id: 'demo_assistant_mindmap',
+      role: 'assistant',
+      type: 'mindmap',
+      title: '思维导图',
+      description: '已为你生成思维导图，支持导出图片、缩放与适配视图。',
+      loading: false,
+      markdown: snap.markdown
+    }
+  ]
 })
 
 onBeforeUnmount(() => {

@@ -115,7 +115,7 @@ onBeforeUnmount(() => {
           data-test="brand-logo"
           class="brand-logo"
           src="/logo-character.svg"
-          alt="智课坊 | EDU Prep"
+          alt="智课引擎 | EDU Prep"
         />
       </div>
 
@@ -155,7 +155,7 @@ onBeforeUnmount(() => {
             </div>
 
             <h1 class="hero-title">
-              <span class="hero-title-top">智课坊</span>
+              <span class="hero-title-top">智课引擎</span>
               <span class="gradient-text">EDU Prep</span>
             </h1>
 
@@ -241,7 +241,7 @@ onBeforeUnmount(() => {
         <img
           class="footer-logo"
           src="/logo-character.svg"
-          alt="鏅鸿鍧?| EDU Prep"
+          alt="智课引擎 | EDU Prep"
         />
       </div>
       <div class="footer-meta">

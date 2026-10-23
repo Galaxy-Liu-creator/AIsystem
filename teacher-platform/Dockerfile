@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-ENV VITE_API_BASE=http://127.0.0.1:5174
+ENV VITE_API_BASE=/api
 RUN npm run build
 
 FROM nginx:1.28-alpine

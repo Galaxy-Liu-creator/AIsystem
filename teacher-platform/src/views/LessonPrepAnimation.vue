@@ -1,11 +1,12 @@
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import LottiePlayer from '../components/LottiePlayer.vue'
 import linkFileImg from '../assets/链接文件.png'
 import voiceImg from '../assets/语音.png'
 import sendImg from '../assets/发送.png'
 import animationJson from '../assets/animation (1).json'
 import { useVoiceInput } from '../composables/useVoiceInput'
+import { loadDemoSnapshot } from '../utils/demoSnapshot.js'
 
 const animationInput = ref('')
 const { isRecording, isSupported, toggleRecording } = useVoiceInput(animationInput)
@@ -362,6 +363,19 @@ watch(
     resetState()
   }
 )
+
+onMounted(async () => {
+  const snap = await loadDemoSnapshot('animation')
+  if (!snap?.html) return
+  htmlMode.value = true
+  hasSentMessages.value = true
+  codeTab.value = 'preview'
+  generatedCode.value = snap.html
+  messages.value = [
+    { role: 'user', content: snap.prompt || '生成《钱的演变》课堂互动小游戏' },
+    { role: 'assistant', content: '已生成 HTML，已在右侧代码区域展示，可切换「预览」查看效果。' }
+  ]
+})
 
 watch(
   () => htmlMode.value,

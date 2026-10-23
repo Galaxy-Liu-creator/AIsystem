@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, nextTick } from 'vue'
+import { ref, watch, computed, nextTick, onMounted } from 'vue'
 import LottiePlayer from '../components/LottiePlayer.vue'
 import linkFileImg from '../assets/链接文件.png'
 import voiceImg from '../assets/语音.png'
@@ -8,6 +8,7 @@ import sendImg from '../assets/发送.png'
 import dataAnalysisAnimation from '../assets/Data Analysis Animation _ Visualize Insights Effectively.json'
 import { useVoiceInput } from '../composables/useVoiceInput'
 import { apiRequest, resolveApiUrl } from '../api/http'
+import { loadDemoSnapshot } from '../utils/demoSnapshot.js'
 
 const dataInput = ref('')
 const { isRecording, isSupported, toggleRecording } = useVoiceInput(dataInput)
@@ -95,6 +96,16 @@ watch(
     resetState()
   }
 )
+
+onMounted(async () => {
+  const snap = await loadDemoSnapshot('data')
+  if (!snap?.analyzeResult) return
+  analyzeResult.value = snap.analyzeResult
+  selectedChartIds.value = Array.isArray(snap.selectedChartIds) ? snap.selectedChartIds : []
+  combinedImageUrl.value = snap.combinedImageUrl || ''
+  chatFileId.value = snap.analyzeResult.file_id || ''
+  chatMessages.value = Array.isArray(snap.messages) ? snap.messages : []
+})
 
 function onPickFile(e) {
   const f = e.target.files?.[0]

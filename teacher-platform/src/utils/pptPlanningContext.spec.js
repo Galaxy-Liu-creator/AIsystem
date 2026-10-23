@@ -95,12 +95,12 @@ describe('pptPlanningContext utils', () => {
       {
         filename: '平台演示.mp4',
         parsed_content: {
-          video_summary: '本视频整体演示智课坊平台的备课中心、PPT生成入口和教师备课流程。',
+          video_summary: '本视频整体演示智课引擎平台的备课中心、PPT生成入口和教师备课流程。',
         },
       },
     ])
 
-    expect(merged).toContain('本视频整体演示智课坊平台')
+    expect(merged).toContain('本视频整体演示智课引擎平台')
     expect(merged).not.toContain('这张截图显示')
   })
 })

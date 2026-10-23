@@ -102,7 +102,9 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # 在共享路径安装 Chromium，确保非 root 用户也可访问。
+# 浏览器包走 npmmirror，避免云服务器从官方地址下载过慢。
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright
+ENV PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright
 ARG INSTALL_PLAYWRIGHT=true
 RUN if [ "$INSTALL_PLAYWRIGHT" = "true" ]; then \
             python -m playwright install chromium; \

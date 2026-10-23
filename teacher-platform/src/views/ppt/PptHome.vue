@@ -127,7 +127,7 @@ function handleClickOutside(event) {
 // Examples removed per user request
 
 const modeDescriptions = {
-  dialog: '输入想法，智课坊为您生成完整PPT',
+  dialog: '输入想法，智课引擎为您生成完整PPT',
   file: '上传或粘贴文档内容，AI 自动解析并生成教学演示文稿',
   renovation: '上传 PDF 或 PPTX，AI 会解析并输出翻新版本 PPT'
 }
@@ -661,7 +661,7 @@ async function handleNext() {
         </h1>
         <p data-test="ppt-home-hero-subtitle" class="hero-subtitle-editorial">
           <span class="hero-subtitle-line">从教学主题到完整演示，</span>
-          <span class="hero-subtitle-line">智课坊助力完成构思、结构与表达</span>
+          <span class="hero-subtitle-line">智课引擎助力完成构思、结构与表达</span>
         </p>
       </section>
 

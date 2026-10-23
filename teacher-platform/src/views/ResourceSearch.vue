@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import lottie from 'lottie-web'
 import { apiRequest } from '../api/http.js'
+import { loadDemoSnapshot } from '../utils/demoSnapshot.js'
 import resourceLoadingAnimation from '../assets/resource-loading.json'
 
 const query = ref('')
@@ -100,6 +101,22 @@ watch(loading, async (isLoading) => {
 onBeforeUnmount(() => {
   destroyLoadingAnimation()
 })
+
+onMounted(async () => {
+  const snap = await loadDemoSnapshot('resource')
+  if (!Array.isArray(snap?.items) || !snap.items.length) return
+  query.value = snap.keyword || ''
+  searched.value = true
+  resources.value = snap.items
+})
+
+function isIconUrl(icon) {
+  return /^https?:\/\//i.test(String(icon || '').trim())
+}
+
+function onIconError(item) {
+  item.icon = '📚'
+}
 
 /** 展示用：去掉 [标题](url) 中的链接语法，保留标题文字 */
 function stripMarkdownLinks(text) {
@@ -229,7 +246,14 @@ async function runSearch() {
         <article v-for="item in displayResources" :key="item.id" class="resource-card">
           <div class="card-header">
             <div class="icon-pill">
-              <span class="icon-text">{{ item.icon }}</span>
+              <img
+                v-if="isIconUrl(item.icon)"
+                :src="item.icon"
+                alt=""
+                class="icon-image"
+                @error="onIconError(item)"
+              />
+              <span v-else class="icon-text">{{ item.icon || '📚' }}</span>
             </div>
             <div class="card-title-wrap">
               <h3 class="card-title">{{ item.title }}</h3>
@@ -436,6 +460,13 @@ async function runSearch() {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.icon-image {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
 
 .icon-text {
@@ -471,6 +502,8 @@ async function runSearch() {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
+  flex: 1;
 }
 
 .card-title {

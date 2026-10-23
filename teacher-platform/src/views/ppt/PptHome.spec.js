@@ -36,7 +36,7 @@ describe('PptHome view', () => {
     expect(title.text()).toBe('让每一页，都更像作品')
     expect(subtitleLines).toHaveLength(2)
     expect(subtitleLines[0].text()).toBe('从教学主题到完整演示，')
-    expect(subtitleLines[1].text()).toBe('智课坊助力完成构思、结构与表达')
+    expect(subtitleLines[1].text()).toBe('智课引擎助力完成构思、结构与表达')
     expect(title.classes()).toContain('hero-title-editorial')
     expect(subtitle.classes()).toContain('hero-subtitle-editorial')
   })
